@@ -18,10 +18,10 @@ from ..models.encoders import EncoderFactory
 from ..models.optimizers import AdamFactory, OptimizerFactory
 from ..models.q_functions import QFunctionFactory
 from .base import AlgoBase
-from .torch.sac_impl import DiscreteSACImpl, SACImpl
+from .torch.adp_sac_impl import DiscreteSACImpl, AdpSACImpl
 
 
-class SAC(AlgoBase):
+class AdpSAC(AlgoBase):
     r"""Soft Actor-Critic algorithm.
 
     SAC is a DDPG-based maximum entropy RL algorithm, which produces
@@ -113,7 +113,7 @@ class SAC(AlgoBase):
     _n_critics: int
     _initial_temperature: float
     _use_gpu: Optional[Device]
-    _impl: Optional[SACImpl]
+    _impl: Optional[AdpSACImpl]
 
     def __init__(
         self,
@@ -138,7 +138,9 @@ class SAC(AlgoBase):
         scaler: ScalerArg = None,
         action_scaler: ActionScalerArg = None,
         reward_scaler: RewardScalerArg = None,
-        impl: Optional[SACImpl] = None,
+        impl: Optional[AdpSACImpl] = None,
+        prior_policy,
+        target_kl,
         **kwargs: Any
     ):
         super().__init__(
@@ -166,10 +168,13 @@ class SAC(AlgoBase):
         self._use_gpu = check_use_gpu(use_gpu)
         self._impl = impl
 
+        self._prior_policy = prior_policy 
+        self._target_kl = target_kl
+
     def _create_impl(
         self, observation_shape: Sequence[int], action_size: int
     ) -> None:
-        self._impl = SACImpl(
+        self._impl = AdpSACImpl(
             observation_shape=observation_shape,
             action_size=action_size,
             actor_learning_rate=self._actor_learning_rate,
@@ -189,6 +194,8 @@ class SAC(AlgoBase):
             scaler=self._scaler,
             action_scaler=self._action_scaler,
             reward_scaler=self._reward_scaler,
+            prior_policy=self._prior_policy,
+            target_kl=self._target_kl
         )
         self._impl.build()
 
@@ -206,6 +213,9 @@ class SAC(AlgoBase):
 
         actor_loss = self._impl.update_actor(batch)
         metrics.update({"actor_loss": actor_loss})
+
+        prior_loss = self._impl.update_prior_weight(batch)
+        metrics.update({"prior_loss": prior_loss})
 
         self._impl.update_critic_target()
         self._impl.update_actor_target()

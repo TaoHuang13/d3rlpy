@@ -206,6 +206,7 @@ class AlgoBase(LearnableBase):
         tensorboard_dir: Optional[str] = None,
         timelimit_aware: bool = True,
         callback: Optional[Callable[[AlgoProtocol, int, int], None]] = None,
+        decay_step: int = None,
     ) -> None:
         """Start training loop of online deep reinforcement learning.
 
@@ -270,6 +271,7 @@ class AlgoBase(LearnableBase):
             tensorboard_dir=tensorboard_dir,
             timelimit_aware=timelimit_aware,
             callback=callback,
+            decay_step=decay_step,
         )
 
     def collect(

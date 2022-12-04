@@ -199,6 +199,14 @@ class NormalPolicy(Policy):
         out = self.forward(x, with_log_prob=True)
         return cast(Tuple[torch.Tensor, torch.Tensor], out)
 
+    def compute_log_prob(
+        self, x: torch.Tensor, a: torch.Tensor
+    ):
+        dist = self.dist(x)
+        log_prob = dist.log_prob(a)
+
+        return log_prob
+
     def sample_n_with_log_prob(
         self,
         x: torch.Tensor,

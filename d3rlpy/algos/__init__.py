@@ -19,6 +19,10 @@ from .sac import SAC, DiscreteSAC
 from .td3 import TD3
 from .td3_plus_bc import TD3PlusBC
 
+from .cql_decay import CQL_Decay
+from.adp_sac import AdpSAC
+from .ens_sac import EnsSAC
+
 __all__ = [
     "AlgoBase",
     "AWAC",
@@ -47,6 +51,10 @@ __all__ = [
     "DiscreteRandomPolicy",
     "get_algo",
     "create_algo",
+
+    'CQL_Decay',
+    'AdpSAC',
+    'EnsSAC'
 ]
 
 
@@ -77,6 +85,9 @@ CONTINUOUS_ALGORITHMS: Dict[str, Type[AlgoBase]] = {
     "td3": TD3,
     "td3_plus_bc": TD3PlusBC,
     "random": RandomPolicy,
+    'cq_decay': CQL_Decay,
+    'AdpSAC': AdpSAC,
+    'EnsSAC': EnsSAC
 }
 
 

@@ -10,3 +10,4 @@ from .dqn_impl import DoubleDQNImpl, DQNImpl
 from .plas_impl import PLASImpl, PLASWithPerturbationImpl
 from .sac_impl import DiscreteSACImpl, SACImpl
 from .td3_impl import TD3Impl
+from .adp_sac_impl import AdpSACImpl

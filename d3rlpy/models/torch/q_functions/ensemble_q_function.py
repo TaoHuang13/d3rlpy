@@ -137,6 +137,16 @@ class EnsembleQFunction(nn.Module):  # type: ignore
     def q_funcs(self) -> nn.ModuleList:
         return self._q_funcs
 
+    def std(self, x, a):
+        with torch.no_grad():
+            values = []
+            for q_func in self.q_funcs:
+                values.append(q_func(x, a))
+
+        values = torch.stack(values, dim=1)
+
+        return values.mean(1), values.std(1) 
+
 
 class EnsembleDiscreteQFunction(EnsembleQFunction):
     def forward(self, x: torch.Tensor, reduction: str = "mean") -> torch.Tensor:

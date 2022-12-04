@@ -118,6 +118,7 @@ def train_single_env(
     tensorboard_dir: Optional[str] = None,
     timelimit_aware: bool = True,
     callback: Optional[Callable[[AlgoProtocol, int, int], None]] = None,
+    decay_step: int = None,
 ) -> None:
     """Start training loop of online deep reinforcement learning.
 
@@ -178,7 +179,7 @@ def train_single_env(
         stacked_frame = StackedObservation(observation_shape, algo.n_frames)
 
     # save hyperparameters
-    algo.save_params(logger)
+    #algo.save_params(logger)
 
     # switch based on show_progress flag
     xrange = trange if show_progress else range
@@ -194,6 +195,10 @@ def train_single_env(
     observation = env.reset()
     rollout_return = 0.0
     for total_step in xrange(1, n_steps + 1):
+        # if decay_step is not None:
+        #     assert decay_step > 0
+        #     algo._conservative_weight = max(0, algo._init_conservative_weight * (decay_step - total_step) / decay_step)
+
         with logger.measure_time("step"):
             # stack observation if necessary
             if is_image:
